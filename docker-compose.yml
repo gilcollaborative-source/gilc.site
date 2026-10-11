@@ -22,7 +22,7 @@ services:
 
   # 2. Dynamic Web Application (Built via GitHub Actions)
   app:
-    image: ghcr.io/gilcollaborative/gilc.site/app:latest
+    image: ghcr.io/gilcollaborative-source/gilc.site/app:latest
     container_name: web_app
     restart: always
     environment:

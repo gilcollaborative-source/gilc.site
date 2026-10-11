@@ -73,8 +73,11 @@ jobs:
             # Enforce exact image repository name
             sed -i 's|ghcr.io/gilcollaborative/|ghcr.io/gilcollaborative-source/|g' docker-compose.yml
             
-            # Ensure SSL directory and initial placeholder certificate exist for Nginx to boot
-            if [ ! -f /opt/web-stack/nginx/certs/live/gilcollaborative.com/fullchain.pem ]; then
+            # Sync official Let's Encrypt certificates if issued, or fallback to temporary placeholder
+            if [ -d /opt/web-stack/nginx/certs/live/gilcollaborative.com-0001 ]; then
+              rm -rf /opt/web-stack/nginx/certs/live/gilcollaborative.com
+              cp -rL /opt/web-stack/nginx/certs/live/gilcollaborative.com-0001 /opt/web-stack/nginx/certs/live/gilcollaborative.com
+            elif [ ! -f /opt/web-stack/nginx/certs/live/gilcollaborative.com/fullchain.pem ]; then
               mkdir -p /opt/web-stack/nginx/certs/live/gilcollaborative.com
               openssl req -x509 -nodes -newkey rsa:2048 -days 30 -subj "/CN=gilcollaborative.com" \
                 -keyout /opt/web-stack/nginx/certs/live/gilcollaborative.com/privkey.pem \

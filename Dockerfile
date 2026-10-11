@@ -13,7 +13,7 @@ ENV PORT=3000
 COPY package*.json ./
 
 # Install production dependencies only
-RUN npm ci --omit=dev --ignore-scripts
+RUN npm install --omit=dev --no-audit --ignore-scripts
 
 # Copy application source and assets
 COPY src/ ./src/

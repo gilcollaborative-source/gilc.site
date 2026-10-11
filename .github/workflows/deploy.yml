@@ -73,12 +73,20 @@ jobs:
             # Enforce exact image repository name
             sed -i 's|ghcr.io/gilcollaborative/|ghcr.io/gilcollaborative-source/|g' docker-compose.yml
             
+            # Ensure SSL directory and initial placeholder certificate exist for Nginx to boot
+            if [ ! -f /opt/web-stack/nginx/certs/live/gilcollaborative.com/fullchain.pem ]; then
+              mkdir -p /opt/web-stack/nginx/certs/live/gilcollaborative.com
+              openssl req -x509 -nodes -newkey rsa:2048 -days 30 -subj "/CN=gilcollaborative.com" \
+                -keyout /opt/web-stack/nginx/certs/live/gilcollaborative.com/privkey.pem \
+                -out /opt/web-stack/nginx/certs/live/gilcollaborative.com/fullchain.pem
+            fi
+
             # Authenticate GHCR on server
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
             
-            # Pull latest application image and restart entire stack
+            # Pull latest application image and start entire stack
             docker compose pull app
-            docker compose up -d
+            docker compose up -d --remove-orphans
             
             # Clean up dangling images to conserve memory and disk
             docker image prune -f

@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+.git
+.github
+.agents
+gilc.site.docs
+*.docx
+*.pw.txt
+.env
+.DS_Store

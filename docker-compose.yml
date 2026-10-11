@@ -1,0 +1,69 @@
+services:
+  # 1. Reverse Proxy Gateway & SSL
+  nginx:
+    image: nginx:alpine
+    container_name: web_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/certs:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    deploy:
+      resources:
+        limits:
+          memory: 120M
+    depends_on:
+      - app
+    networks:
+      - web_net
+
+  # 2. Dynamic Web Application (Built via GitHub Actions)
+  app:
+    image: ghcr.io/gilcollaborative/gilc.site/app:latest
+    container_name: web_app
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgres://app_user:YourSecureDbPassword123@db:5432/app_db
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      - PUBLIC_URL=https://gilcollaborative.com
+    deploy:
+      resources:
+        limits:
+          memory: 350M
+    depends_on:
+      - db
+    networks:
+      - web_net
+
+  # 3. PostgreSQL Database (Low-memory optimized for 1GB/2GB VPS)
+  db:
+    image: postgres:16-alpine
+    container_name: web_db
+    restart: always
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: YourSecureDbPassword123
+      POSTGRES_DB: app_db
+    command: >
+      postgres -c shared_buffers=64MB
+               -c work_mem=4MB
+               -c maintenance_work_mem=16MB
+               -c max_connections=30
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+    networks:
+      - web_net
+
+networks:
+  web_net:
+    driver: bridge

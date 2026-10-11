@@ -1,0 +1,21 @@
+{
+  "name": "gilc-site",
+  "version": "1.0.0",
+  "description": "Global Integrated Learning Collaborative Inc. Official Website & Booking Platform",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "pg": "^8.13.0",
+    "stripe": "^17.2.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

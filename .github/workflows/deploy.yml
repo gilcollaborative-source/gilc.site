@@ -66,9 +66,12 @@ jobs:
             sudo chown -R $USER:$USER /opt/web-stack
             cd /opt/web-stack
             
-            # Fetch latest docker-compose.yml and nginx config
-            curl -fsSL https://raw.githubusercontent.com/gilcollaborative-source/gilc.site/main/docker-compose.yml -o docker-compose.yml
-            curl -fsSL https://raw.githubusercontent.com/gilcollaborative-source/gilc.site/main/nginx/conf.d/default.conf -o nginx/conf.d/default.conf
+            # Fetch latest docker-compose.yml and nginx config with cache-buster
+            curl -fsSL "https://raw.githubusercontent.com/gilcollaborative-source/gilc.site/main/docker-compose.yml?ts=$(date +%s)" -o docker-compose.yml
+            curl -fsSL "https://raw.githubusercontent.com/gilcollaborative-source/gilc.site/main/nginx/conf.d/default.conf?ts=$(date +%s)" -o nginx/conf.d/default.conf
+            
+            # Enforce exact image repository name
+            sed -i 's|ghcr.io/gilcollaborative/|ghcr.io/gilcollaborative-source/|g' docker-compose.yml
             
             # Authenticate GHCR on server
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin

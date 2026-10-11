@@ -71,7 +71,7 @@ jobs:
             curl -fsSL https://raw.githubusercontent.com/gilcollaborative-source/gilc.site/main/nginx/conf.d/default.conf -o nginx/conf.d/default.conf
             
             # Authenticate GHCR on server
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.repository_owner }}" --password-stdin
             
             # Pull latest application image and restart entire stack
             docker compose pull app

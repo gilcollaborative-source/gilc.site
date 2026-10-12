@@ -194,6 +194,7 @@ let currentLang = localStorage.getItem('gilc_lang') || 'zh';
 function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('gilc_lang', lang);
+  document.documentElement.lang = (lang === 'zh') ? 'zh-CN' : 'en';
 
   // Update button active state
   document.querySelectorAll('.lang-btn').forEach(btn => {
